@@ -9,7 +9,7 @@ const session  = require('express-session');
 const webhookRouter  = require('./routes/webhook');
 const paymentRoutes  = require('./routes/payment');
 const authRoutes     = require('./routes/auth');
-
+const postRoutes = require('./routes/posts');
 const app = express();
 
 // 1) Mount Stripe webhook with raw body parsing
@@ -19,6 +19,7 @@ app.use(
   webhookRouter
 );
 
+app.use('/api/posts', postRoutes);
 // 2) Then your normal middleware
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
