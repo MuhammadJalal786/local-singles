@@ -44,26 +44,34 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await require('../models/User').findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'User not found.' });
-    }
-
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'User not found.' });
     const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid password.' });
-    }
+    if (!isMatch)  return res.status(400).json({ message: 'Invalid password.' });
 
-    req.session.user = user;
-
-    res.json({
-      message: 'Logged in successfully!',
+    // ← HERE: only store the fields you actually need downstream
+    req.session.user = {
+      _id:                user._id,
+      email:              user.email,
+      firstName:          user.firstName,
+      lastName:           user.lastName,
       subscriptionStatus: user.subscriptionStatus,
-      trialEndsAt: user.trialEndsAt
-    });
+      trialEndsAt:        user.trialEndsAt
+    };
+
+    return res.json({ message: 'Logged in successfully!' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Login error:', err);
+    return res.status(500).json({ message: 'Server error during login.' });
   }
+};
+
+exports.getCurrentUser = (req, res) => {
+  if (!req.session?.user?._id) {
+    return res.status(401).json({ message: 'Not authenticated' });
+  }
+  // You can return the full session.user or re-fetch fresh data if you like:
+  return res.json(req.session.user);
 };
 
 exports.me = async (req, res) => {
