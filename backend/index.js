@@ -11,6 +11,12 @@ const authRoutes     = require('./routes/auth');
 const postRoutes     = require('./routes/posts');
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// notify route
+const notifyRoutes = require('./routes/notify');
+app.use('/api/notify', notifyRoutes);
 
 // 1️⃣ Stripe webhook (raw body) — stays first
 app.use(
@@ -24,8 +30,7 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,

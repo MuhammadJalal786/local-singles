@@ -1,45 +1,41 @@
 // backend/routes/posts.js
 const express = require('express');
-const router = express.Router();
+const router  = express.Router();
+const Post    = require('../models/Post');           // ← add this
 const postController = require('../controllers/postController');
 
+// Auth guard
 function ensureAuth(req, res, next) {
-  if (req.session && req.session.user) {
-    // attach the session user onto req.user for your routes
+  if (req.session && req.session.user && req.session.user._id) {
     req.user = req.session.user;
     return next();
   }
   return res.status(401).json({ message: 'Unauthorized: please log in.' });
 }
 
-// …apply ensureAuth to your /feed route as you already do…
+// Public feed endpoint (requires login)
 router.get('/feed', ensureAuth, async (req, res) => {
-  // now you can freely use req.user here
-  const posts = await Post.find().sort({ createdAt: -1 });
-  res.json(posts);
+  try {
+    const posts = await Post
+      .find()
+      .populate('author', 'firstName lastName')    // optional
+      .sort({ createdAt: -1 });
+    return res.json(posts);
+  } catch (err) {
+    console.error('Error fetching posts feed:', err);
+    return res.status(500).json({ message: 'Server error while loading feed' });
+  }
 });
 
+// All other post routes also require auth
 router.use(ensureAuth);
 
-// Create a new post
 router.post('/', postController.createPost);
-
-// Get all posts
 router.get('/', postController.getAllPosts);
-
-// Get one post
 router.get('/:postId', postController.getPostById);
-
-// Like a post
 router.post('/:postId/like', postController.likePost);
-
-// Add a comment
 router.post('/:postId/comments', postController.addComment);
-
-// Delete a post
 router.delete('/:postId', postController.deletePost);
-
-// Delete a comment
 router.delete('/:postId/comments/:commentId', postController.deleteComment);
 
 module.exports = router;
