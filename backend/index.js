@@ -5,8 +5,8 @@ const mongoose = require('mongoose');
 const cors     = require('cors');
 const session  = require('express-session');
 
-const webhookRouter  = require('./routes/webhook');
-const paymentRoutes  = require('./routes/payment');
+//const webhookRouter  = require('./routes/webhook');
+//const paymentRoutes  = require('./routes/payment');
 const authRoutes     = require('./routes/auth');
 const postRoutes     = require('./routes/posts');
 
@@ -19,11 +19,11 @@ const notifyRoutes = require('./routes/notify');
 app.use('/api/notify', notifyRoutes);
 
 // 1️⃣ Stripe webhook (raw body) — stays first
-app.use(
-  '/api/webhook',
-  express.raw({ type: 'application/json' }),
-  webhookRouter
-);
+// app.use(
+//   '/api/webhook',
+//   express.raw({ type: 'application/json' }),
+//   webhookRouter
+// );
 
 // 2️⃣ Standard middleware
 app.use(cors({
@@ -40,7 +40,7 @@ app.use(session({
 
 // 3️⃣ Now mount routes that rely on session/auth
 app.use('/api/posts',   postRoutes);
-app.use('/api/payment', paymentRoutes);
+//app.use('/api/payment', paymentRoutes);
 app.use('/api/auth',    authRoutes);
 
 // 4️⃣ Health check
