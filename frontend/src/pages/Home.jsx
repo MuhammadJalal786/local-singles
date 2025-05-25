@@ -11,6 +11,49 @@ import {
   Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 
+function AuthPrompt() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h1 className="text-center text-3xl font-bold text-gray-900">LOCAL SINGLES</h1>
+          <h2 className="mt-6 text-center text-2xl font-medium text-gray-900">
+            Connect with people around you
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Please sign in or create an account to continue
+          </p>
+        </div>
+        
+        <div className="mt-8 space-y-4">
+          <div>
+            <a 
+              href="/login"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            >
+              Sign in to your account
+            </a>
+          </div>
+          
+          <div>
+            <a 
+              href="/signup"
+              className="group relative w-full flex justify-center py-3 px-4 border border-gray-300 text-sm font-medium rounded-md text-teal-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            >
+              Create a new account
+            </a>
+          </div>
+        </div>
+        
+        <div className="pt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Join our community and discover local events near you
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function PostCard({ post, onLike }) {
   return (
@@ -61,41 +104,78 @@ function PostCard({ post, onLike }) {
 }
 
 export default function Home() {
-  const [posts, setPosts] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
+  // Check if user is authenticated
   useEffect(() => {
-    const fetchFeed = async () => {
+    const checkAuth = async () => {
       try {
-        const { data } = await axios.get('/api/posts/feed', { withCredentials: true })
-        setPosts(data)
+        const { data } = await axios.get('/api/auth/me', { withCredentials: true });
+        setCurrentUser(data);
       } catch (err) {
-        console.error(err)
+        // If error, user is not authenticated
+        console.log('User not authenticated:', err.message);
+        setCurrentUser(null);
       } finally {
-        setLoading(false)
+        setAuthChecked(true);
       }
+    };
+    
+    checkAuth();
+  }, []);
+
+  // Fetch posts only if user is authenticated
+  useEffect(() => {
+    if (currentUser) {
+      const fetchFeed = async () => {
+        try {
+          const { data } = await axios.get('/api/posts/feed', { withCredentials: true });
+          setPosts(data);
+        } catch (err) {
+          console.error('Error fetching posts:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      fetchFeed();
+    } else if (authChecked) {
+      // If not authenticated but auth check is complete, stop loading
+      setLoading(false);
     }
-    fetchFeed()
-  }, [])
+  }, [currentUser, authChecked]);
 
   const handleLike = async postId => {
     // optimistic UI
-    setPosts(ps => ps.map(p => p._id === postId ? { ...p, likes: p.likes + 1 } : p))
+    setPosts(ps => ps.map(p => p._id === postId ? { ...p, likes: p.likes + 1 } : p));
+    
     try {
-      await axios.post(`/api/posts/${postId}/like`, {}, { withCredentials: true })
+      await axios.post(`/api/posts/${postId}/like`, {}, { withCredentials: true });
     } catch (err) {
-      console.error(err)
+      console.error('Error liking post:', err);
+      // Revert the optimistic update on error
+      setPosts(ps => ps.map(p => p._id === postId ? { ...p, likes: p.likes - 1 } : p));
     }
-  }
+  };
 
+  // Show loading state while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        Loading…
+        <div className="text-teal-600 text-xl">Loading...</div>
       </div>
-    )
+    );
   }
 
+  // If not authenticated, show buttons to redirect to login/signup pages
+  if (!currentUser) {
+    return <AuthPrompt />;
+  }
+
+  // If authenticated, show the main application
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* ─── SIDEBAR ────────────────────────────────────── */}
@@ -145,18 +225,37 @@ export default function Home() {
           </div>
           <div className="flex items-center space-x-4">
             <BellIcon className="w-6 h-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
+            {currentUser && (
+              <div className="flex items-center">
+                <img
+                  src={currentUser.avatar || '/assets/avatar-placeholder.png'}
+                  alt={currentUser.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <span className="ml-2 font-medium">{currentUser.name}</span>
+              </div>
+            )}
           </div>
         </header>
 
         {/* FEED */}
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto">
-            {posts.map(post => (
-              <PostCard key={post._id} post={post} onLike={handleLike} />
-            ))}
+            {posts.length > 0 ? (
+              posts.map(post => (
+                <PostCard key={post._id} post={post} onLike={handleLike} />
+              ))
+            ) : (
+              <div className="bg-white rounded-lg shadow p-8 text-center">
+                <h3 className="text-xl font-medium mb-2">No posts yet</h3>
+                <p className="text-gray-600">
+                  Follow some users or create your first post to get started!
+                </p>
+              </div>
+            )}
           </div>
         </main>
       </div>
     </div>
-  )
+  );
 }
