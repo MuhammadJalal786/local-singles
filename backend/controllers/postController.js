@@ -1,6 +1,37 @@
 // backend/controllers/postController.js
 const Post = require('../models/Post');
 
+exports.getFeed = async (req, res) => {
+  try {
+    const userId = req.session.user._id;
+    // fetch all posts, newest first, and populate author
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate('author', 'firstName lastName avatar'); // adjust fields as needed
+
+    // annotate each post with a `hasLiked` boolean for the current user
+    const feed = posts.map(post => {
+      const hasLiked = post.likes.some(id => id.toString() === userId.toString());
+      return {
+        _id:      post._id,
+        author:   post.author,
+        content:  post.content,
+        image:    post.image,
+        likes:    post.likes.length,
+        hasLiked, 
+        comments: post.comments,
+        createdAt: post.createdAt
+      };
+    });
+
+    return res.json(feed);
+  } catch (err) {
+    console.error('Error in getFeed:', err);
+    return res.status(500).json({ message: 'Could not fetch feed' });
+  }
+};
+
+
 // 1. Create a new post
 exports.createPost = async (req, res) => {
   try {
@@ -45,18 +76,33 @@ exports.getPostById = async (req, res) => {
 // 4. Like a post
 exports.likePost = async (req, res) => {
   try {
-    const post = await Post.findByIdAndUpdate(
-      req.params.postId,
-      { $inc: { likes: 1 } },
-      { new: true }
-    );
-    if (!post) return res.status(404).json({ error: 'Post not found' });
-    res.json(post);
+    const postId = req.params.postId;
+    const userId = req.session.user._id; // ensureAuth already put user in session
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    // Check if user has already liked:
+    const index = post.likes.findIndex(id => id.toString() === userId.toString());
+    if (index === -1) {
+      // not yet liked → add user to likes
+      post.likes.push(userId);
+    } else {
+      // already liked → remove from array (toggle off)
+      post.likes.splice(index, 1);
+    }
+
+    await post.save();
+    // return the new like count and whether the user “hasLiked”
+    return res.json({
+      likesCount: post.likes.length,
+      hasLiked:   index === -1 // true if we just added
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error in likePost:', err);
+    return res.status(500).json({ message: 'Could not toggle like' });
   }
 };
-
 // 5. Add a comment
 exports.addComment = async (req, res) => {
   try {

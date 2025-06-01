@@ -14,7 +14,7 @@ function ensureAuth(req, res, next) {
 }
 
 // Public feed endpoint (requires login)
-router.get('/feed', ensureAuth, async (req, res) => {
+router.get('/feed', ensureAuth, postController.getFeed, async (req, res) => {
   try {
     const posts = await Post
       .find()

@@ -58,50 +58,36 @@ function AuthPrompt() {
 function PostCard({ post, onLike }) {
   return (
     <div className="bg-white rounded-lg shadow mb-6 p-4">
-      {/* author + timestamp */}
-      <div className="flex items-center mb-4">
-        <img
-          src={post.author.avatar || '/assets/avatar-placeholder.png'}
-          alt={post.author.name}
-          className="w-10 h-10 rounded-full object-cover mr-3"
-        />
-        <div>
-          <p className="font-medium">{post.author.name}</p>
-          <p className="text-xs text-gray-500">
-            {new Date(post.createdAt).toLocaleString()}
-          </p>
-        </div>
-      </div>
+      {/* …author + timestamp… */}
 
-      {/* content */}
+      {/* content… */}
       <div className="mb-4">
         <p className="whitespace-pre-wrap">{post.content}</p>
         {post.image && (
-          <img
-            src={post.image}
-            alt="Post attachment"
-            className="mt-4 w-full rounded"
-          />
+          <img src={post.image} alt="Post attachment" className="mt-4 w-full rounded" />
         )}
       </div>
 
       {/* actions */}
-      <div className="flex items-center space-x-6 text-gray-600">
+      <div className="flex items-center space-x-6">
         <button
-          onClick={() => onLike(post._id)}
-          className="flex items-center hover:text-teal-600"
+          onClick={() => onLike(post._id, post.hasLiked)}
+          className={`flex items-center ${
+            post.hasLiked ? 'text-teal-600' : 'text-gray-600 hover:text-teal-600'
+          }`}
         >
           <HandThumbUpIcon className="w-5 h-5 mr-1" />
           <span>{post.likes}</span>
         </button>
-        <button className="flex items-center hover:text-teal-600">
-        <ChatBubbleLeftEllipsisIcon className="w-5 h-5 mr-1" />
+        <button className="flex items-center text-gray-600 hover:text-teal-600">
+          <ChatBubbleLeftEllipsisIcon className="w-5 h-5 mr-1" />
           <span>{post.comments.length}</span>
         </button>
       </div>
     </div>
-  )
+  );
 }
+
 
 export default function Home() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -148,18 +134,26 @@ export default function Home() {
     }
   }, [currentUser, authChecked]);
 
-  const handleLike = async postId => {
-    // optimistic UI
-    setPosts(ps => ps.map(p => p._id === postId ? { ...p, likes: p.likes + 1 } : p));
-    
-    try {
-      await axios.post(`/api/posts/${postId}/like`, {}, { withCredentials: true });
-    } catch (err) {
-      console.error('Error liking post:', err);
-      // Revert the optimistic update on error
-      setPosts(ps => ps.map(p => p._id === postId ? { ...p, likes: p.likes - 1 } : p));
-    }
-  };
+const handleLike = async (postId, hasLiked) => {
+  try {
+    const { data } = await axios.post(
+      `/api/posts/${postId}/like`,
+      {},
+      { withCredentials: true }
+    );
+    // data = { likesCount: number, hasLiked: boolean }
+    setPosts(ps =>
+      ps.map(p =>
+        p._id === postId
+          ? { ...p, likes: data.likesCount, hasLiked: data.hasLiked }
+          : p
+      )
+    );
+  } catch (err) {
+    console.error('Error toggling like:', err);
+  }
+};
+
 
   // Show loading state while checking authentication
   if (loading) {
