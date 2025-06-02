@@ -9,6 +9,8 @@ const webhookRouter  = require('./routes/webhook');
 const paymentRoutes  = require('./routes/payment');
 const authRoutes     = require('./routes/auth');
 const postRoutes     = require('./routes/posts');
+const eventRoutes  = require('./routes/events');
+const ensureAdmin  = require('./middleware/ensureAdmin'); // not strictly needed here, events.js already uses it
 
 const app = express();
 
@@ -37,6 +39,9 @@ app.use(session({
 app.use('/api/posts',   postRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/auth',    authRoutes);
+
+ // 4️⃣ Mount events (which internally uses ensureAdmin for creation/edit/delete)
+ app.use('/api/events', eventRoutes);
 
 // 4️⃣ Health check
 app.get('/', (req, res) => res.send('Backend is working!'));

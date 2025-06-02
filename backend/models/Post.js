@@ -12,7 +12,7 @@ const postSchema = new mongoose.Schema({
   content:   { type: String, required: true },
   image:     { type: String },
   // change likes: Number → likes: [ObjectId]
-  likes:     [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  likes:     [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
   comments:  [commentSchema],
   createdAt: { type: Date, default: Date.now }
 });
