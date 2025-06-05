@@ -1,4 +1,4 @@
-// backend/routes/events.js
+// backend/routes/event.js
 const express      = require('express');
 const router       = express.Router();
 const Event        = require('../models/Event');
@@ -33,16 +33,24 @@ router.get('/', ensureAuth, async (req, res) => {
  * 2. GET /api/events/:id
  *    Event details (including attendee list).
  */
+// backend/routes/events.js
+
 router.get('/:id', ensureAuth, async (req, res) => {
   try {
-    const evt = await Event.findById(req.params.id).populate('attendees', 'firstName lastName');
-    if (!evt) return res.status(404).json({ message: 'Event not found' });
+    // Populate "attendees.userId" so that a.userId becomes a User document
+    const evt = await Event.findById(req.params.id)
+      .populate('attendees.userId', 'firstName lastName');
+
+    if (!evt) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
     return res.json(evt);
   } catch (err) {
     console.error('Error fetching event:', err);
     return res.status(500).json({ message: 'Could not fetch event' });
   }
 });
+
 
 /**
  * 3. POST /api/events
@@ -91,25 +99,26 @@ router.delete('/:id', ensureAuth, ensureAdmin, async (req, res) => {
   }
 });
 
-/**
- * 6. POST /api/events/:id/rsvp
- *    (User only) RSVP to an event, if not sold out and age within [minAge, maxAge].
- */
+ /**
+  * 6. POST /api/events/:id/rsvp
+  *    (User only) RSVP to an event, if not sold out and age within [minAge, maxAge].
+  *    Now we insert a subdoc { userId, status: 'pending' }.
+  */
 router.post('/:id/rsvp', ensureAuth, async (req, res) => {
   try {
     const userId = req.user._id;
-    const evt = await Event.findById(req.params.id);
+    const evt    = await Event.findById(req.params.id);
     if (!evt) return res.status(404).json({ message: 'Event not found' });
 
-    // Sold out check:
-    if (evt.attendees.length >= evt.capacity) {
+    // Sold out check (count only approved+pending):
+    if ((evt.attendees.length) >= evt.capacity) {
       return res.status(400).json({ message: 'Sold out' });
     }
 
-    // Age check:
+    // Age check (same as before):
     const userDob = new Date(req.user.dob);
     const today   = new Date();
-    let age = today.getFullYear() - userDob.getFullYear();
+    let age       = today.getFullYear() - userDob.getFullYear();
     if (
       today.getMonth() < userDob.getMonth() ||
       (today.getMonth() === userDob.getMonth() && today.getDate() < userDob.getDate())
@@ -120,14 +129,16 @@ router.post('/:id/rsvp', ensureAuth, async (req, res) => {
       return res.status(403).json({ message: 'Not in age range' });
     }
 
-    // Already RSVPed?
-    if (evt.attendees.some(a => a.toString() === userId.toString())) {
+    // Already RSVPed?  Look for any subdoc with this userId
+    if (evt.attendees.some(a => a.userId.toString() === userId.toString())) {
       return res.status(400).json({ message: 'Already RSVPed' });
     }
 
-    evt.attendees.push(userId);
+    // Push a new subdoc with status 'pending'
+    evt.attendees.push({ userId, status: 'pending' });
     await evt.save();
-    return res.json({ message: 'RSVP successful', attendees: evt.attendees.length });
+
+    return res.json({ message: 'RSVP pending approval', attendeesCount: evt.attendees.length });
   } catch (err) {
     console.error('Error RSVPing:', err);
     return res.status(500).json({ message: 'Could not RSVP' });
@@ -136,17 +147,19 @@ router.post('/:id/rsvp', ensureAuth, async (req, res) => {
 
 /**
  * 7. DELETE /api/events/:id/rsvp
- *    (User only) Cancel RSVP.
+ *    (User only) Cancel RSVP (remove their subdoc entirely).
  */
 router.delete('/:id/rsvp', ensureAuth, async (req, res) => {
   try {
     const userId = req.user._id;
-    const evt = await Event.findById(req.params.id);
+    const evt    = await Event.findById(req.params.id);
     if (!evt) return res.status(404).json({ message: 'Event not found' });
 
-    evt.attendees = evt.attendees.filter(a => a.toString() !== userId.toString());
+    // Filter out any attendee subdoc whose userId matches
+    evt.attendees = evt.attendees.filter(a => a.userId.toString() !== userId.toString());
     await evt.save();
-    return res.json({ message: 'RSVP canceled', attendees: evt.attendees.length });
+
+    return res.json({ message: 'RSVP canceled', attendeesCount: evt.attendees.length });
   } catch (err) {
     console.error('Error canceling RSVP:', err);
     return res.status(500).json({ message: 'Could not cancel RSVP' });

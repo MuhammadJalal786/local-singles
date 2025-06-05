@@ -11,9 +11,7 @@ const userSchema = new mongoose.Schema({
   dob:        { type: Date,   required: true },
   password:   { type: String, required: true },
 
-
   isAdmin:    { type: Boolean, default: false },
-
   subscriptionStatus: {
     type: String,
     enum: ['inactive','trialing','active'],
@@ -22,7 +20,17 @@ const userSchema = new mongoose.Schema({
   trialEndsAt:          { type: Date },
   stripeCustomerId:     { type: String },
   stripeSubscriptionId: { type: String },
+
+  // Make these optional by removing `required: true`:
+  avatar:      { type: String },
+  city:        { type: String },            // no longer required
+  zip:         { type: String },            // no longer required
+  interests:   { type: String },            // no longer required
+  occupation:  { type: String },            // no longer required
+  bio:         { type: String, maxlength: 1000 }  // no longer required
 });
+
+// … (rest of pre-save, comparePassword, etc.) …
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {

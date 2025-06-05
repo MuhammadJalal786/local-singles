@@ -1,5 +1,6 @@
 // frontend/src/components/Header.jsx
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   MagnifyingGlassIcon,
   HomeIcon,
@@ -23,10 +24,18 @@ export default function Header() {
 
       {/* Icon buttons */}
       <div className="flex items-center space-x-6">
-        <HomeIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
-        <ChatBubbleLeftIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
-        <UserCircleIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
-        <BellIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
+        <Link to="/home">
+          <HomeIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
+        </Link>
+        <Link to="/">
+          <ChatBubbleLeftIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
+        </Link>
+        <Link to="/profile">
+          <UserCircleIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
+        </Link>
+        <Link to="#">
+          <BellIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
+        </Link>
       </div>
     </header>
   );
