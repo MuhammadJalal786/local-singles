@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   isAdmin:    { type: Boolean, default: false },
   subscriptionStatus: {
     type: String,
-    enum: ['inactive','trialing','active'],
+    enum: ['inactive','trialing','active', 'cancelled'],
     default: 'inactive'
   },
   trialEndsAt:          { type: Date },

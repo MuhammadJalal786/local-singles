@@ -1,16 +1,52 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+// frontend/src/pages/Success.jsx
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
-const Success = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-    <div className="bg-white rounded-xl shadow-lg p-8 text-center max-w-md">
-      <h1 className="text-3xl font-bold mb-4">Thank you for subscribing!</h1>
-      <p className="mb-6">Your subscription is now active. You can access all member features.</p>
-      <Link to="/home" className="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700">
-        Go to Dashboard
-      </Link>
+export default function Success() {
+  const [status, setStatus]     = useState('Processing subscription…');
+  const [searchParams]          = useSearchParams();
+  const navigate                = useNavigate();
+
+  useEffect(() => {
+    // 1️⃣ Get the session_id from the query string
+    const sessionId = searchParams.get('session_id');
+    if (!sessionId) {
+      setStatus('No session ID found.');
+      return;
+    }
+
+    // 2️⃣ Confirm the session on the backend
+    axios
+      .post(
+        'http://localhost:5000/api/payment/confirm',
+        { sessionId },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log('Confirm response:', res.data);
+        setStatus('Subscription activated! Redirecting…');
+
+        // 3️⃣ Let the user see the success message for a sec then go to pricing
+        setTimeout(() => {
+          navigate('/settings/pricing');
+        }, 1500);
+      })
+      .catch((err) => {
+        console.error('Error confirming subscription:', err);
+        setStatus(
+          err.response?.data?.message ||
+            'Failed to confirm subscription. Please contact support.'
+        );
+      });
+  }, [searchParams, navigate]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+        <h1 className="text-2xl font-bold mb-4">Payment Successful</h1>
+        <p className="text-gray-700">{status}</p>
+      </div>
     </div>
-  </div>
-);
-
-export default Success;
+  );
+}

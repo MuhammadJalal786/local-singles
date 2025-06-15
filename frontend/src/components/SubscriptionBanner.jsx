@@ -1,0 +1,42 @@
+// frontend/src/components/SubscriptionBanner.jsx
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+export default function SubscriptionBanner() {
+  const [info, setInfo]     = useState(null);
+  const [daysLeft, setDays] = useState(0);
+
+  useEffect(() => {
+    axios
+      .get('/api/payment/subscription', { withCredentials: true })
+      .then(({ data }) => {
+        setInfo(data);
+        const now = Date.now();
+        let msLeft;
+        if (data.status === 'trialing') {
+          msLeft = data.trialEndsAt - now;
+        } else if (['cancelled','active'].includes(data.status)) {
+          msLeft = data.currentPeriodEnd - now;
+        }
+        const days = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+        setDays(days > 0 ? days : 0);
+      })
+      .catch(() => {
+        /* quietly fail—no banner if not logged in or no sub */
+      });
+  }, []);
+
+  if (!info || info.status === 'active') return null;
+
+  const isTrial = info.status === 'trialing';
+  const verb    = isTrial ? 'expire' : 'end';
+  const label   = isTrial
+    ? `Your free trial will ${verb} in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}.`
+    : `Your subscription will ${verb} in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}.`;
+
+  return (
+    <div className="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-700 p-4 mb-4">
+      <p className="font-medium">{label}</p>
+    </div>
+  );
+}
