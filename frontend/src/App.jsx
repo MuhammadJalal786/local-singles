@@ -20,6 +20,10 @@ import ChangePassword  from './pages/settings/ChangePassword';
 import Pricing         from './pages/settings/Pricing';
 import HelpSupport     from './pages/settings/HelpSupport';
 import TermsOfService  from './pages/settings/TermsOfService';
+import Messages      from './pages/Messages';
+import MessageThread from './pages/MessageThread';
+import UserProfile from './pages/UserProfile';
+import About from './pages/About';
 
 function App() {
   return (
@@ -39,8 +43,11 @@ function App() {
         <Route path="/events"      element={<Events />} />
         <Route path="/events/:id"  element={<EventDetail />} />
         <Route path="/myevents"    element={<MyEvents />} />
-
+        <Route path="/users/:userId" element={<UserProfile />} />
         {/* Settings index + sub‐pages */}
+        <Route path="/about" element={<About />} />
+        <Route path="/messages"        element={<Messages />} />
+        <Route path="/messages/:userId" element={<MessageThread />} />
         <Route path="/settings"                                    element={<SettingsIndex />} />
         <Route path="/settings/account-security/change-password"   element={<ChangePassword />} />
         <Route path="/settings/account-security/deactivate"        element={<AccountSecurity />} />

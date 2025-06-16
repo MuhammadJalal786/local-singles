@@ -165,5 +165,45 @@ router.delete('/:id/rsvp', ensureAuth, async (req, res) => {
     return res.status(500).json({ message: 'Could not cancel RSVP' });
   }
 });
+router.get('/mine', ensureAuth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const now    = new Date();
+
+    const events = await Event.find({
+      'attendees.userId': userId,
+      'attendees.status': 'approved',
+      date: { $gte: now }
+    }).sort({ date: 1 });
+
+    return res.json(events);
+  } catch (err) {
+    console.error('Error fetching upcoming My Events:', err);
+    return res.status(500).json({ message: 'Could not fetch upcoming events' });
+  }
+});
+
+/**
+ * GET /api/events/mine/past
+ * List past events the user was APPROVED for.
+ */
+router.get('/mine/past', ensureAuth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const now    = new Date();
+
+    const events = await Event.find({
+      'attendees.userId': userId,
+      'attendees.status': 'approved',
+      date: { $lt: now }
+    }).sort({ date: -1 });
+
+    return res.json(events);
+  } catch (err) {
+    console.error('Error fetching past My Events:', err);
+    return res.status(500).json({ message: 'Could not fetch past events' });
+  }
+});
+
 
 module.exports = router;

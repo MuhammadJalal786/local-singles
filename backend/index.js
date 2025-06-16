@@ -14,6 +14,8 @@ const postRouter     = require('./routes/posts');
 const eventRoutes    = require('./routes/event');
 const userRoutes     = require('./routes/user');
 const supportRoutes = require('./routes/support');
+const messagesRouter = require('./routes/messages');
+const usersRouter = require('./routes/users');
 
 // ── Create Express app ─────────────────────────────────────────────────────────────
 const app = express();
@@ -63,6 +65,8 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/auth',    authRoutes);
 app.use('/api/events',  eventRoutes);
 app.use('/api/support', supportRoutes);
+app.use('/api/messages', messagesRouter);
+app.use('/api/users', usersRouter);
 
 // ── Health check ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 app.get('/', (req, res) => res.send('Backend is working!'));

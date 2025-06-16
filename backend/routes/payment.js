@@ -27,11 +27,7 @@ router.get('/subscription', ensureAuth, async (req, res) => {
     // 1) Fetch from Stripe
     const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
 
-    // Debugging: Log subscription details
-    console.log('Stripe Subscription:', subscription);
-    console.log('current_period_end:', subscription.current_period_end);
-    console.log('cancel_at:', subscription.cancel_at);
-
+    
     // 2) Read the item-level timestamps (in seconds)
     const secondsEnd =
       subscription.items.data[0].current_period_end  ||  // billing-period end :contentReference[oaicite:5]{index=5}
