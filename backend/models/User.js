@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
   sex:        { type: String, required: true },
   dob:        { type: Date,   required: true },
   password:   { type: String, required: true },
+  isBlocked:          { type: Boolean, default: false },
+  labels:             { type: [String],  default: [] },
 
   isAdmin:    { type: Boolean, default: false },
   subscriptionStatus: {

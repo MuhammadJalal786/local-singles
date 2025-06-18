@@ -18,15 +18,14 @@ const eventSchema = new mongoose.Schema({
   title:          { type: String,  required: true },
   description:    { type: String,  required: true },
   date:           { type: Date,    required: true },   // Start date/time
-  endTime:        { type: Date },                       // End date/time (optional)
-  zip:            { type: String,  required: true },
-  city:           { type: String,  required: true },
+  startTime:    { type: String, required: true },                       
+  address:      { type: String, required: true },
   minAge:         { type: Number,  required: true },
   maxAge:         { type: Number,  required: true },
   image:          { type: String },                     // URL for hero image
   capacity:       { type: Number,  required: true },
   attendees:      [attendeeSchema],                      // Now subdocs instead of bare IDs
-  price:          { type: Number,  required: true },    // e.g. ticket price in USD
+  price:          { type: Number,   },    // e.g. ticket price in USD
   type:           { type: String,  required: true },    // e.g. "Party", "Concert", etc.
   discount:       { type: Number,  default: 0 },        // e.g. percentage discount
   coupleAllowed:  { type: Boolean, default: false },    // Whether couples can attend

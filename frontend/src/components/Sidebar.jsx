@@ -1,6 +1,8 @@
 // frontend/src/components/Sidebar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import {
   HomeIcon,
   CalendarIcon,
@@ -15,6 +17,17 @@ export default function Sidebar() {
 
   // helper to apply "active" styling if current route matches
   const isActive = (path) => pathname === path;
+
+  const navigate = useNavigate();
+
+const handleLogout = async () => {
+  try {
+    await axios.get('/api/auth/logout');
+    navigate('/login');
+  } catch (err) {
+    console.error('Logout failed:', err);
+  }
+};
 
   return (
     <aside className="w-64 h-screen bg-white border-r flex flex-col pt-8">
@@ -73,13 +86,13 @@ export default function Sidebar() {
           <span>Settings</span>
         </Link>
 
-        <Link
-          to="/logout"
-          className="flex items-center space-x-3 px-2 py-2 rounded-md text-gray-700 hover:bg-teal-50"
-        >
-          <ArrowRightOnRectangleIcon className="h-6 w-6" />
-          <span>Logout</span>
-        </Link>
+        <button
+  onClick={handleLogout}
+  className="w-full text-left flex items-center space-x-3 px-2 py-2 rounded-md text-gray-700 hover:bg-teal-50"
+>
+  <ArrowRightOnRectangleIcon className="h-6 w-6" />
+  <span>Logout</span>
+</button>
       </nav>
     </aside>
   );

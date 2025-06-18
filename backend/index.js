@@ -16,7 +16,10 @@ const userRoutes     = require('./routes/user');
 const supportRoutes = require('./routes/support');
 const messagesRouter = require('./routes/messages');
 const usersRouter = require('./routes/users');
-
+const adminSettingsRouter = require('./routes/admin/settings');
+const adminUsersRouter    = require('./routes/admin/users');
+const adminMessagesRouter = require('./routes/admin/messages');
+const adminEventsRouter = require('./routes/admin/events');
 // ── Create Express app ─────────────────────────────────────────────────────────────
 const app = express();
 
@@ -59,6 +62,8 @@ app.use(
 // ── 3️⃣ Mount user routes (needs to come AFTER session middleware) ───────────────────
 app.use('/api/user', userRoutes);
 
+app.use('/api/admin/settings', adminSettingsRouter);
+
 // ── 4️⃣ Other protected/public routes ―――――――――――――――――――――――――――――――――――――――――――――
 app.use('/api/posts',   postRouter);
 app.use('/api/payment', paymentRoutes);
@@ -67,6 +72,9 @@ app.use('/api/events',  eventRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/messages', messagesRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/admin/users',    adminUsersRouter);
+app.use('/api/admin/messages', adminMessagesRouter);
+app.use('/api/admin/events', adminEventsRouter);
 
 // ── Health check ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 app.get('/', (req, res) => res.send('Backend is working!'));

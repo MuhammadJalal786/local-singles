@@ -24,6 +24,12 @@ import Messages      from './pages/Messages';
 import MessageThread from './pages/MessageThread';
 import UserProfile from './pages/UserProfile';
 import About from './pages/About';
+import AdminLayout from './components/AdminLayout'; 
+import MembershipManagement from './pages/admin/MembershipManagement';
+import UserManagement from './pages/admin/UserManagement';
+import EventManagement from './pages/admin/EventManagement';
+import EventForm            from './pages/admin/EventForm';
+
 
 function App() {
   return (
@@ -35,6 +41,16 @@ function App() {
         <Route path="/payment"   element={<PaymentMethod />} />
         <Route path="/checkout"  element={<Checkout />} />
         <Route path="/success"   element={<Success />} />
+
+        {/* Admin routes */}
+        
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="membership" element={<MembershipManagement />} />
+          <Route path="users"      element={<UserManagement />} />
+          <Route path="events"     element={<EventManagement />} />
+          <Route path="events/new"        element={<EventForm />} />
+          <Route path="events/:id/edit"   element={<EventForm />} />
+        </Route>
 
         {/* Profile */}
         <Route path="/profile"   element={<AccountSettings />} />

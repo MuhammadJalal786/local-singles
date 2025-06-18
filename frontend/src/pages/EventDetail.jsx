@@ -165,8 +165,9 @@ const hasRSVPed = () => {
             <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg" />
             <div className="absolute bottom-6 left-6 text-white space-y-1">
               <h1 className="text-3xl font-semibold">{evt.title}</h1>
+              {/* show full address instead of city/zip */}
               <p className="text-lg">
-                {evt.city}, {evt.zip} &middot; {startDateStr}
+                {evt.address} &middot; {startDateStr}
               </p>
             </div>
             {/* Join / Cancel button at top-right of hero */}
@@ -209,6 +210,11 @@ const hasRSVPed = () => {
             <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
               <table className="min-w-full divide-y divide-gray-200">
                 <tbody className="bg-white divide-y divide-gray-200">
+                  {/* Address */}
+                  <tr>
+                    <td className="px-6 py-4 font-medium text-gray-700">Address</td>
+                    <td className="px-6 py-4 text-gray-900">{evt.address}</td>
+                  </tr>
                   <tr>
                     <td className="px-6 py-4 font-medium text-gray-700">ID</td>
                     <td className="px-6 py-4 text-gray-900">{evt._id}</td>
@@ -263,10 +269,13 @@ const hasRSVPed = () => {
                 width="100%"
                 height="100%"
                 frameBorder="0"
-                scrolling="no"
-                marginHeight="0"
-                marginWidth="0"
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(evt.city + ' ' + evt.zip)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                loading="lazy"
+                src={
+                  // point the map at the full address
+                  `https://maps.google.com/maps?q=${
+                    encodeURIComponent(evt.address)
+                  }&t=&z=15&output=embed`
+                }
               />
             </div>
           </section>

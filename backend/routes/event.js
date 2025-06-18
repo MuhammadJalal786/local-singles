@@ -33,7 +33,7 @@ router.get('/', ensureAuth, async (req, res) => {
  * 2. GET /api/events/:id
  *    Event details (including attendee list).
  */
-// backend/routes/events.js
+// backend/routes/event.js
 
 router.get('/:id', ensureAuth, async (req, res) => {
   try {
