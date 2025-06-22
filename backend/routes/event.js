@@ -1,3 +1,4 @@
+console.log('➡️  Event routes loaded');
 // backend/routes/event.js
 const express      = require('express');
 const router       = express.Router();
