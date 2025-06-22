@@ -1,6 +1,6 @@
 // frontend/src/pages/settings/ChangePassword.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import SettingsLayout from '../../components/SettingsLayout';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
@@ -48,8 +48,8 @@ export default function ChangePassword() {
 
     try {
       setLoading(true);
-      await axios.put(
-        'http://localhost:5000/api/user/change-password',
+      await api.put(
+        '/api/user/change-password',
         { currentPassword, newPassword },
         { withCredentials: true }
       );

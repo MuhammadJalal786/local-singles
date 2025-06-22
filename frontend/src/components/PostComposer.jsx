@@ -1,6 +1,6 @@
 // src/components/PostComposer.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 export default function PostComposer({ onNewPost }) {
   const [content, setContent]   = useState('');
@@ -12,8 +12,8 @@ export default function PostComposer({ onNewPost }) {
 
     setSubmitting(true);
     try {
-      const { data: createdPost } = await axios.post(
-        'http://localhost:5000/api/posts',
+      const { data: createdPost } = await api.post(
+        '/api/posts',
         { content: content.trim() },
         { withCredentials: true }
       );

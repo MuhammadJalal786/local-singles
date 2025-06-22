@@ -1,13 +1,13 @@
 // frontend/src/components/SubscriptionBanner.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 export default function SubscriptionBanner() {
   const [info, setInfo]     = useState(null);
   const [daysLeft, setDays] = useState(0);
 
   useEffect(() => {
-    axios
+    api
       .get('/api/payment/subscription', { withCredentials: true })
       .then(({ data }) => {
         setInfo(data);

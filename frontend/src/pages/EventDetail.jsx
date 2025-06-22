@@ -1,7 +1,7 @@
 // frontend/src/pages/EventDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 import Layout from '../components/Layout';
 import RequireProfileCompletion from '../components/RequireProfileCompletion';
@@ -21,12 +21,12 @@ export default function EventDetail() {
   // Fetch event + current user on mount
   useEffect(() => {
     // 1) Get user
-    axios
+    api
       .get('http://localhost:5000/api/user/me', { withCredentials: true })
       .then((res) => {
         setUser(res.data.user);
         // 2) Then fetch the event by ID
-        return axios.get(`http://localhost:5000/api/events/${id}`, { withCredentials: true });
+        return api.get(`http://localhost:5000/api/events/${id}`, { withCredentials: true });
       })
       .then((res) => {
         setEvt(res.data);
@@ -73,7 +73,7 @@ const hasRSVPed = () => {
     setModalLoading(true);
     setModalError('');
     try {
-      await axios.post(`http://localhost:5000/api/events/${id}/rsvp`, {}, { withCredentials: true });
+      await api.post(`/api/events/${id}/rsvp`, {}, { withCredentials: true });
          // Update local state: add a proper subdocument { userId, status: 'pending' }
       setEvt((prev) => ({
         ...prev,
@@ -95,7 +95,7 @@ const hasRSVPed = () => {
  const cancelRequest = async () => {
     try {
       // 1) Tell the backend to remove this user from attendees
-      await axios.delete(`http://localhost:5000/api/events/${id}/rsvp`, {
+      await api.delete(`http://localhost:5000/api/events/${id}/rsvp`, {
         withCredentials: true
       });
 

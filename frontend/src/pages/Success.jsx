@@ -1,6 +1,6 @@
 // frontend/src/pages/Success.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 export default function Success() {
@@ -17,9 +17,9 @@ export default function Success() {
     }
 
     // 2️⃣ Confirm the session on the backend
-    axios
+    api
       .post(
-        'http://localhost:5000/api/payment/confirm',
+        '/api/payment/confirm',
         { sessionId },
         { withCredentials: true }
       )

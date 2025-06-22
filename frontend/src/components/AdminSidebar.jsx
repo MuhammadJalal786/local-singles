@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import {
   TableCellsIcon,
   UsersIcon,
@@ -20,7 +20,7 @@ export default function AdminSidebar() {
 
   const handleLogout = async () => {
     try {
-      await axios.get('/api/auth/logout');
+      await api.get('/api/auth/logout');
       navigate('/login');
     } catch (err) {
       console.error(err);

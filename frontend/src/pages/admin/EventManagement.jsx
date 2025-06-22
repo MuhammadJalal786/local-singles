@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
-import axios from 'axios';
+import api from "../../api";
 
 export default function EventManagement() {
   const [events, setEvents]       = useState([]);
@@ -20,7 +20,7 @@ export default function EventManagement() {
   const fetchEvents = async (p = 1, append = false) => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/admin/events', {
+      const res = await api.get('/api/admin/events', {
         params: {
           search,
           past: showPast,
@@ -60,13 +60,13 @@ export default function EventManagement() {
   // Delete
   const deleteEvent = async id => {
     if (!window.confirm('Delete this event?')) return;
-    await axios.delete(`/api/admin/events/${id}`);
+    await api.delete(`/api/admin/events/${id}`);
     setEvents(ev => ev.filter(e => e.eventId !== id));
   };
 
   // Send announcement
   const sendAnnounce = async () => {
-    const res = await axios.post(`/api/admin/events/${announceEv}/announce`, {
+    const res = await api.post(`/api/admin/events/${announceEv}/announce`, {
       text: announceText
     });
     alert(`Sent to ${res.data.sentCount} users`);

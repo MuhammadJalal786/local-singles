@@ -1,13 +1,13 @@
 // frontend/src/components/Feed.jsx
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '../api'
 
 export default function Feed({ currentUser }) {
   const [posts, setPosts] = useState([])
 
   useEffect(() => {
-    axios
-      .get('http://localhost:5000/api/posts/feed', { withCredentials: true })
+    api
+      .get('/api/posts/feed', { withCredentials: true })
       .then(res => setPosts(res.data))
       .catch(err => console.error(err))
   }, [])

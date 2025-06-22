@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
+import api from "../../api";
 import { Menu } from '@headlessui/react';
 
 export default function UserManagement() {
@@ -14,7 +14,7 @@ export default function UserManagement() {
   const fetchUsers = async (p = 1, append = false) => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/admin/users', {
+      const res = await api.get('/api/admin/users', {
         params: { page: p, limit: 20, search }
       });
       const { users: data, totalPages } = res.data;
@@ -48,13 +48,13 @@ export default function UserManagement() {
 
   // Handlers
   const changeStatus = async (id, status) => {
-    await axios.put(`/api/admin/users/${id}/status`, { status });
+    await api.put(`/api/admin/users/${id}/status`, { status });
     // update in-place
     setUsers(u => u.map(x => x.userId === id ? { ...x, subscriptionStatus: status } : x));
   };
 
   const toggleBlock = async (id, block) => {
-    await axios.put(`/api/admin/users/${id}/block`, { block });
+    await api.put(`/api/admin/users/${id}/block`, { block });
     setUsers(u => u.map(x => x.userId === id ? { ...x, isBlocked: block } : x));
   };
 
@@ -155,7 +155,7 @@ function MassMessageButton() {
   });
   const [text, setText]   = useState('');
   const sendBroadcast = async () => {
-    await axios.post('/api/admin/messages/broadcast', {
+    await api.post('/api/admin/messages/broadcast', {
       filters: {
         ...filters,
         ageMin: filters.ageMin ? Number(filters.ageMin) : undefined,

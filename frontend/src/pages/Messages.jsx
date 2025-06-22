@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import axios  from 'axios';
+import api  from '../api';
 
 export default function Messages() {
   const [threads, setThreads] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('/api/messages')
+    api.get('/api/messages')
       .then(res => setThreads(res.data))
       .catch(console.error);
   }, []);

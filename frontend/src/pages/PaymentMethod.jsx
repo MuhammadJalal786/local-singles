@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import LoginImage from '../../assets/Payment.jpeg';
 
 const PaymentMethod = () => {
@@ -12,8 +12,8 @@ const PaymentMethod = () => {
 
   // Redirect if already subscribed/trialing
   useEffect(() => {
-    axios
-      .get('http://localhost:5000/api/auth/me', { withCredentials: true })
+    api
+      .get('/api/auth/me', { withCredentials: true })
       .then(res => {
         const { subscriptionStatus } = res.data;
 
@@ -42,8 +42,8 @@ const PaymentMethod = () => {
       return;
     }
     try {
-      await axios.post(
-        'http://localhost:5000/api/payment/trial',
+      await api.post(
+        '/api/payment/trial',
         {},
         { withCredentials: true }
       );
@@ -59,8 +59,8 @@ const PaymentMethod = () => {
       return;
     }
     try {
-      const { data } = await axios.post(
-        'http://localhost:5000/api/payment/create-checkout-session',
+      const { data } = await api.post(
+        '/api/payment/create-checkout-session',
         { mode: 'subscription' }, // always card
         { withCredentials: true }
       );

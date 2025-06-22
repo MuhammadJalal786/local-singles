@@ -1,6 +1,6 @@
 // frontend/src/pages/Home.jsx
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '../api'
 import AuthPrompt from '../components/Authprompt' // your prompt component
 import Feed from '../components/Feed'               // the “logged-in” home/feed
 import Sidebar from '../components/Sidebar'
@@ -12,8 +12,8 @@ export default function Home() {
 
   useEffect(() => {
     // Ask the server “who am I?” — if 200, save user, if 401, mark as not logged in
-    axios
-      .get('http://localhost:5000/api/auth/me', { withCredentials: true })
+    api
+      .get('/api/auth/me', { withCredentials: true })
       .then(res => {
         setUser(res.data)    // e.g. { _id, email, firstName, subscriptionStatus, … }
       })

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import {
   HomeIcon,
   CalendarIcon,
@@ -23,7 +23,7 @@ export default function Sidebar() {
 
 const handleLogout = async () => {
   try {
-    await axios.get('/api/auth/logout');
+    await api.get('/api/auth/logout');
     navigate('/login');
   } catch (err) {
     console.error('Logout failed:', err);

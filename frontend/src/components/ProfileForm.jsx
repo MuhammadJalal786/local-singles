@@ -1,6 +1,6 @@
 // frontend/src/components/ProfileForm.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 export default function ProfileForm({ initialData, onSave }) {
   const [form, setForm] = useState({
@@ -72,8 +72,8 @@ export default function ProfileForm({ initialData, onSave }) {
         dob:        form.dob,
       };
 
-      const res = await axios.put(
-        'http://localhost:5000/api/user/me',
+      const res = await api.put(
+        '/api/user/me',
         payload,
         { withCredentials: true }
       );

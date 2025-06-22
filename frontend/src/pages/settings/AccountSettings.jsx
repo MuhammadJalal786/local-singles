@@ -1,7 +1,7 @@
 // frontend/src/pages/settings/AccountSettings.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../api';
 
 import Layout from '../../components/Layout';
 import ProfileForm from '../../components/ProfileForm';
@@ -15,8 +15,8 @@ export default function AccountSettings() {
 
   useEffect(() => {
     // Fetch the current user’s profile
-    axios
-      .get('http://localhost:5000/api/user/me', { withCredentials: true })
+    api
+      .get('/api/user/me', { withCredentials: true })
       .then((res) => {
         setUser(res.data.user);
       })

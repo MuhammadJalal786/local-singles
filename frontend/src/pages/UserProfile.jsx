@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import axios  from 'axios';
+import api  from '../api';
 
 export default function UserProfile() {
   const { userId }   = useParams();
@@ -10,7 +10,7 @@ export default function UserProfile() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    axios
+    api
       .get(`/api/users/${userId}`)
       .then(res => setUser(res.data))
       .catch(err => console.error(err));

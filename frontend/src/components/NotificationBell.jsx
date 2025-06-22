@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { BellIcon } from '@heroicons/react/24/outline';     
 import { Link } from 'react-router-dom';
 
@@ -12,7 +12,7 @@ export default function NotificationBell() {
   // Fetch & update unread count
   const fetchNotes = async () => {
     try {
-      const { data } = await axios.get('/api/notifications', { withCredentials: true });
+      const { data } = await api.get('/api/notifications', { withCredentials: true });
       setNotes(data);
       setUnread(data.filter(n => !n.read).length);
     } catch (err) {
@@ -33,7 +33,7 @@ export default function NotificationBell() {
     if (nextOpen && unreadCount > 0) {
       // Mark all read on open
       try {
-        await axios.post('/api/notifications/mark-all-read', {}, { withCredentials: true });
+        await api.post('/api/notifications/mark-all-read', {}, { withCredentials: true });
         setUnread(0);
         setNotes(prev => prev.map(n => ({ ...n, read: true })));
       } catch (err) {
@@ -69,7 +69,7 @@ export default function NotificationBell() {
                 key={n._id}
                 to={n.link}
                 className="flex justify-between items-start px-4 py-2 hover:bg-gray-100"
-                onClick={() => axios.post(`/api/notifications/${n._id}/mark-read`, {}, { withCredentials: true })}
+                onClick={() => api.post(`/api/notifications/${n._id}/mark-read`, {}, { withCredentials: true })}
               >
                 <span className="text-sm text-gray-800">{n.message}</span>
                 <span className="text-xs text-gray-500">

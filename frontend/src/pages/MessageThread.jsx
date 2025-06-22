@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
-import axios  from 'axios';
+import api  from '../api';
 
 export default function MessageThread() {
   const { userId } = useParams();
@@ -13,12 +13,12 @@ export default function MessageThread() {
 
   // get current user
   useEffect(() => {
-    axios.get('/api/auth/me').then(res => setMe(res.data));
+    api.get('/auth/me').then(res => setMe(res.data));
   }, []);
 
   // fetch & poll
   const fetchMessages = () => {
-    axios.get(`/api/messages/${userId}`)
+    api.get(`/messages/${userId}`)
       .then(res => setMessages(res.data))
       .catch(console.error);
   };
@@ -32,7 +32,7 @@ export default function MessageThread() {
   // send
   const sendMessage = async () => {
     if (!text.trim()) return;
-    await axios.post(`/api/messages/${userId}`, { text });
+    await api.post(`/messages/${userId}`, { text });
     setText('');
     fetchMessages();
   };

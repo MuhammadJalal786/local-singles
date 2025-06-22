@@ -1,6 +1,6 @@
 // frontend/src/pages/Events.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { Link } from 'react-router-dom';
 
 import Layout from '../components/Layout';
@@ -14,12 +14,12 @@ export default function Events() {
 
   useEffect(() => {
     // 1) Fetch current user (to check subscriptionStatus)
-    axios
-      .get('http://localhost:5000/api/user/me', { withCredentials: true })
+    api
+      .get('/api/user/me', { withCredentials: true })
       .then((res) => {
         setUser(res.data.user);
         // 2) Fetch all upcoming events
-        return axios.get('http://localhost:5000/api/events', { withCredentials: true });
+        return api.get('/api/events', { withCredentials: true });
       })
       .then((res) => {
         setEvents(res.data);

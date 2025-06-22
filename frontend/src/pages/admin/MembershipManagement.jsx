@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from "../../api";;
 
 export default function MembershipManagement() {
   const [price, setPrice] = useState(10);
@@ -7,7 +7,7 @@ export default function MembershipManagement() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    axios
+    api
       .get('/api/admin/settings/membershipPrice')
       .then(res => setPrice(res.data.price))
       .catch(console.error)
@@ -17,7 +17,7 @@ export default function MembershipManagement() {
   const savePrice = async () => {
     setSaving(true);
     try {
-      await axios.put('/api/admin/settings/membershipPrice', { price: Number(price) });
+      await api.put('/api/admin/settings/membershipPrice', { price: Number(price) });
       alert('Membership price updated');
     } catch (err) {
       console.error(err);

@@ -1,7 +1,7 @@
 // frontend/src/components/RequireProfileCompletion.jsx
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 /**
  * Wrap any page that should be blocked until the profile is complete.
@@ -19,8 +19,8 @@ export default function RequireProfileCompletion({ children }) {
 
   useEffect(() => {
     // 1) Fetch the current user’s profile
-    axios
-      .get('http://localhost:5000/api/user/me', { withCredentials: true })
+    api
+      .get('/api/user/me', { withCredentials: true })
       .then((res) => {
         const u = res.data.user;
 

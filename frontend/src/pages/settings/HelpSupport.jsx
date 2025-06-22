@@ -1,6 +1,6 @@
 // frontend/src/pages/settings/HelpSupport.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import SettingsLayout from '../../components/SettingsLayout';
 import Layout from '../../components/Layout';
 
@@ -24,8 +24,8 @@ export default function HelpSupport() {
 
     try {
       setLoading(true);
-      await axios.post(
-        'http://localhost:5000/api/support',
+      await api.post(
+        '/api/support',
         { subject, message },
         { withCredentials: true }
       );

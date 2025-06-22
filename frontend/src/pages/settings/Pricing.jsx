@@ -1,6 +1,6 @@
 // frontend/src/pages/settings/Pricing.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api';
 
 import Layout from '../../components/Layout';
 import SettingsLayout from '../../components/SettingsLayout';
@@ -12,8 +12,8 @@ export default function Pricing() {
 
   // Fetch subscription on mount
   useEffect(() => {
-    axios
-      .get('http://localhost:5000/api/payment/subscription', {
+    api
+      .get('/api/payment/subscription', {
         withCredentials: true
       })
       .then(res => {
@@ -28,8 +28,8 @@ export default function Pricing() {
 
   const handleCancel = () => {
     if (!window.confirm('Are you sure you want to cancel your subscription?')) return;
-    axios
-      .post('http://localhost:5000/api/payment/cancel-subscription', {}, {
+    api
+      .post('/api/payment/cancel-subscription', {}, {
         withCredentials: true
       })
       .then(() => {
@@ -43,8 +43,8 @@ export default function Pricing() {
   };
 
   const handleCheckout = () => {
-    axios
-      .post('http://localhost:5000/api/payment/create-checkout-session', {}, {
+    api
+      .post('/api/payment/create-checkout-session', {}, {
         withCredentials: true
       })
       .then(res => {

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
-import axios from 'axios';
+import api from "../../api";
 
 export default function EventForm() {
   const { id }       = useParams();
@@ -26,7 +26,7 @@ export default function EventForm() {
   // Load existing event
   useEffect(() => {
     if (!isEdit) return setLoading(false);
-    axios.get(`/api/admin/events/${id}`)
+    api.get(`/admin/events/${id}`)
       .then(res => {
         const e = res.data;
         setForm({
@@ -64,9 +64,9 @@ export default function EventForm() {
     e.preventDefault();
     try {
       if (isEdit) {
-        await axios.put(`/api/admin/events/${id}`, form);
+        await api.put(`/admin/events/${id}`, form);
       } else {
-        await axios.post('/api/admin/events', form);
+        await api.post('/admin/events', form);
       }
       navigate('/admin/events');
     } catch (err) {
@@ -77,8 +77,8 @@ export default function EventForm() {
 
   // Approve / reject an attendee inline
   const updateAttendee = async (userId, status) => {
-    await axios.put(
-      `/api/admin/events/${id}/attendees/${userId}`,
+    await api.put(
+      `/admin/events/${id}/attendees/${userId}`,
       { status }
     );
     setAttendees(a => a.map(x =>
