@@ -7,9 +7,11 @@ export default function AuthPrompt() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h1 className="text-center text-3xl font-bold text-gray-900">LOCAL SINGLES</h1>
+          <h1 className="text-center text-3xl font-bold text-gray-900">
+            Welcome To <span className="text-teal-600">Local Singles</span>
+          </h1>
           <h2 className="mt-6 text-center text-2xl font-medium text-gray-900">
-            Connect with people around you
+            Your gateway to unforgettable local events! Join the community, discover amazing happenings near you, or host your own. Sign in to explore, connect, and experience more.
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Please sign in or create an account to continue
@@ -34,12 +36,6 @@ export default function AuthPrompt() {
               Create a new account
             </Link>
           </div>
-        </div>
-
-        <div className="pt-4 text-center">
-          <p className="text-sm text-gray-600">
-            Join our community and discover local events near you
-          </p>
         </div>
       </div>
     </div>

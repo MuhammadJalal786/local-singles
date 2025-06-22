@@ -5,9 +5,9 @@ import {
   MagnifyingGlassIcon,
   HomeIcon,
   ChatBubbleLeftIcon,
-  UserCircleIcon,
-  BellIcon
+  UserCircleIcon
 } from '@heroicons/react/24/outline';
+import NotificationBell from './NotificationBell';
 
 export default function Header() {
   const [query, setQuery]         = useState('');
@@ -97,9 +97,7 @@ export default function Header() {
         <Link to="/profile">
           <UserCircleIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
         </Link>
-        <Link to="#">
-          <BellIcon className="h-6 w-6 text-gray-600 hover:text-teal-600 cursor-pointer" />
-        </Link>
+          <NotificationBell />
       </div>
     </header>
   );

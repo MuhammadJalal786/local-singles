@@ -2,8 +2,10 @@
 const express     = require('express');
 const router      = express.Router();
 const mongoose    = require('mongoose');
+const User        = require('../../models/User');
 const Event       = require('../../models/Event');
 const Message     = require('../../models/Message');
+const Notification = require('../../models/Notification');
 const ensureAdmin = require('../../middleware/ensureAdmin');
 
 // Helper to compute pending + total attendees
@@ -98,6 +100,20 @@ router.post('/', ensureAdmin, async (req, res) => {
   try {
     const ev = new Event(req.body);
     await ev.save();
+
+    // ── Notify ALL users of the new event ───────────────────────────
+    {
+      const users = await User.find({}).select('_id').lean();
+      await Notification.insertMany(
+        users.map(u => ({
+          userId: u._id,
+          type:   'new_event',
+          message: `New event "${ev.title}" available!`,
+          link:   `/events/${ev._id}`
+        }))
+      );
+    }
+
     return res.status(201).json(ev);
   } catch (err) {
     console.error('POST /api/admin/events error:', err);
@@ -154,6 +170,15 @@ router.put('/:id/attendees/:userId', ensureAdmin, async (req, res) => {
     if (!att) return res.status(404).json({ message: 'Attendee not found' });
     att.status = status;
     await e.save();
+
+    // ── Notify the user of their RSVP decision ───────────────────────
+    await Notification.create({
+      userId: att.userId,
+      type:   'rsvp',
+      message: `Your RSVP for "${e.title}" was ${status}.`,
+      link:   `/events/${e._id}`
+    });
+
     return res.json({ userId: att.userId, status });
   } catch (err) {
     console.error('PUT attendee status error:', err);
@@ -186,6 +211,17 @@ router.post('/:id/announce', ensureAdmin, async (req, res) => {
       text
     }));
     await Message.insertMany(msgs);
+
+    // ── Notify approved attendees via Notifications ────────────────
+    await Notification.insertMany(
+      recipients.map(to => ({
+        userId: to,
+        type:   'admin_announcement',
+        message: text,
+        link:   `/events/${req.params.id}`
+      }))
+    );
+
     return res.json({ sentCount: msgs.length });
   } catch (err) {
     console.error('POST announce error:', err);

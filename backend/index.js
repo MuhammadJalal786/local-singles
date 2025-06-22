@@ -20,6 +20,7 @@ const adminSettingsRouter = require('./routes/admin/settings');
 const adminUsersRouter    = require('./routes/admin/users');
 const adminMessagesRouter = require('./routes/admin/messages');
 const adminEventsRouter = require('./routes/admin/events');
+const notificationsRouter = require('./routes/notifications');
 // ── Create Express app ─────────────────────────────────────────────────────────────
 const app = express();
 
@@ -75,6 +76,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/admin/users',    adminUsersRouter);
 app.use('/api/admin/messages', adminMessagesRouter);
 app.use('/api/admin/events', adminEventsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 // ── Health check ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 app.get('/', (req, res) => res.send('Backend is working!'));

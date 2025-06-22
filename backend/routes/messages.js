@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const router   = express.Router();
 const Message  = require('../models/Message');
 const User     = require('../models/User');
+const Notification = require('../models/Notification');
 const ensureAuth = (req, res, next) => {
   if (req.session?.user) {
     req.userId = req.session.user._id;
@@ -94,6 +95,13 @@ router.post('/:otherUserId', ensureAuth, async (req, res) => {
       text
     });
     await message.save();
+    // ── Create a notification for the recipient ───────────────────────
+    await Notification.create({
+      userId: otherId,
+      type:   'message',
+      message: `New message from ${req.session.user.firstName}`,
+      link:   `/messages/${req.userId}`
+    });
     res.status(201).json(message);
   } catch (err) {
     console.error(err);

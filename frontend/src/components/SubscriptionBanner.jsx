@@ -12,12 +12,8 @@ export default function SubscriptionBanner() {
       .then(({ data }) => {
         setInfo(data);
         const now = Date.now();
-        let msLeft;
-        if (data.status === 'trialing') {
-          msLeft = data.trialEndsAt - now;
-        } else if (['cancelled','active'].includes(data.status)) {
-          msLeft = data.currentPeriodEnd - now;
-        }
+        // Use currentPeriodEnd for both trialing and active/cancelled
+        const msLeft = data.currentPeriodEnd - now;
         const days = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
         setDays(days > 0 ? days : 0);
       })

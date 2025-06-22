@@ -4,6 +4,8 @@ const User        = require('../../models/User');
 const Event       = require('../../models/Event');
 const Message     = require('../../models/Message');
 const ensureAdmin = require('../../middleware/ensureAdmin');
+const Notification = require('../../models/Notification');
+
 
 router.use(ensureAdmin);
 
@@ -58,6 +60,8 @@ router.post('/broadcast', async (req, res) => {
       users = users.filter(u => eventUserIds.has(u._id.toString()));
     }
 
+    users = users.filter(u => u._id.toString() !== req.session.user._id);
+
     // Create messages
     const adminId = req.session.user._id;
     const msgs = users.map(u => ({
@@ -66,6 +70,15 @@ router.post('/broadcast', async (req, res) => {
       text
     }));
     await Message.insertMany(msgs);
+
+    await Notification.insertMany(
+      users.map(u => ({
+      userId: u._id,
+      type:   'message',
+      message: text,
+      link:   `/messages/${adminId}`
+    }))
+  );
 
     res.json({ sentCount: msgs.length });
   } catch (err) {

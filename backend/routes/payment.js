@@ -22,7 +22,21 @@ router.get('/subscription', ensureAuth, async (req, res) => {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
-    // trial logic omitted for brevity…
+    // ── Trialing users: return trial info instead of hitting Stripe ────────
+    if (user.subscriptionStatus === 'trialing' && user.trialEndsAt) {
+      // Retrieve plan price for display
+      const priceObj = await stripe.prices.retrieve(process.env.STRIPE_PRICE_ID);
+      const planName = 'Member Plan';
+
+      return res.json({
+        plan: planName,
+        price: (priceObj.unit_amount || 0) / 100,
+        currency: priceObj.currency,
+        status: 'trialing',
+        currentPeriodEnd: user.trialEndsAt.getTime(),
+        dailyPostUsage: { used: 3, limit: 10 }
+      });
+    }
 
     // 1) Fetch from Stripe
     const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
@@ -214,5 +228,37 @@ router.post(
     }
   }
 );
+
+// Start 14-day trial
+router.post(
+  '/trial',
+  ensureAuth,
+  async (req, res) => {
+    try {
+      // 1. Fetch the user
+      const user = await User.findById(req.userId);
+
+      // 2. Flip to trialing & set the end date
+      user.subscriptionStatus = 'trialing';
+      user.trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+
+      // 3. Persist
+      await user.save();
+
+      // 4. Update the session so GET /api/auth/me sees the new status
+      if (req.session.user) {
+        req.session.user.subscriptionStatus = 'trialing';
+        req.session.user.trialEndsAt = user.trialEndsAt;
+      }
+
+      // 5. Tell the client we’re done
+      return res.json({ message: 'Trial started', redirect: '/' });
+    } catch (err) {
+      console.error('Trial error:', err);
+      return res.status(500).json({ message: 'Could not start trial' });
+    }
+  }
+);
+
 
 module.exports = router;

@@ -1,26 +1,52 @@
 const User = require('../models/User');
 
 exports.getCurrentUser = async (req, res) => {
-  // 1) If there’s no session or no user in session → not authenticated
-  if (!req.session?.user?._id) {
-    return res.status(401).json({ message: 'Not authenticated' });
-  }
-
   try {
-    // 2) Re-fetch the user for up-to-date subscription info
-    const freshUser = await User.findById(req.session.user._id)
-      .select('firstName lastName email subscriptionStatus trialEndsAt');
+    // 1) Must be authenticated
+    if (!req.session.user?._id) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
 
-    // 3) Return only what the frontend needs
+    // 2) Load fresh data from DB
+    const user = await User.findById(req.session.user._id);
+    if (!user) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    // 3) Auto-expire trial if it's past due
+    if (
+      user.subscriptionStatus === 'trialing' &&
+      user.trialEndsAt &&
+      user.trialEndsAt < new Date()
+    ) {
+      user.subscriptionStatus = 'expired';
+      await user.save();
+
+      // Also update the session copy so front-end sees it
+      req.session.user.subscriptionStatus = 'expired';
+    }
+
+    // 4) Send back only the fields the client-side expects
+    const {
+      firstName,
+      lastName,
+      email,
+      subscriptionStatus,
+      trialEndsAt,
+      subscriptionEndsAt
+    } = user;
+
     return res.json({
-      name:              `${freshUser.firstName} ${freshUser.lastName}`,
-      email:             freshUser.email,
-      subscriptionStatus: freshUser.subscriptionStatus,  // e.g. 'active' | 'trialing' | null
-      trialEndsAt:       freshUser.trialEndsAt           // Date or undefined
+      firstName,
+      lastName,
+      email,
+      subscriptionStatus,
+      trialEndsAt,
+      subscriptionEndsAt
     });
   } catch (err) {
-    console.error('getCurrentUser error:', err);
-    return res.status(500).json({ message: err.message });
+    console.error('Error in getCurrentUser:', err);
+    return res.status(500).json({ message: 'Could not fetch user' });
   }
 };
 

@@ -11,6 +11,7 @@ import {
   CogIcon,
   ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
+import Logo from '../../assets/Logo.png';
 
 export default function Sidebar() {
   const { pathname } = useLocation();
@@ -31,6 +32,15 @@ const handleLogout = async () => {
 
   return (
     <aside className="w-64 h-screen bg-white border-r flex flex-col pt-8">
+      {/* Logo + title */}
+      <div className="px-4 pb-6">
+        <Link to="/home" className="flex items-center">
+          <img src={Logo} alt="Local Singles" className="h-8 w-8 mr-2" />
+          <span className="text-xl font-semibold text-teal-600">
+            Local Singles
+          </span>
+        </Link>
+      </div>
       {/* Main navigation - takes up available space */}
       <nav className="flex-1 px-4 space-y-6">
         <Link
