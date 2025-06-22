@@ -1,6 +1,6 @@
 // frontend/src/pages/MyEvents.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { Link } from 'react-router-dom';
 
 import Layout from '../components/Layout';
@@ -16,16 +16,16 @@ export default function MyEvents() {
     (async () => {
       try {
         // 1) Fetch current user
-        const userRes = await axios.get(
-          'http://localhost:5000/api/user/me',
+        const userRes = await api.get(
+          '/api/user/me',
           { withCredentials: true }
         );
         const currentUser = userRes.data.user;
         setUser(currentUser);
 
         // 2) Fetch all events
-        const eventsRes = await axios.get(
-          'http://localhost:5000/api/events',
+        const eventsRes = await api.get(
+          '/api/events',
           { withCredentials: true }
         );
         const allEvents = eventsRes.data;
