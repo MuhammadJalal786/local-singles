@@ -1,9 +1,10 @@
 // frontend/src/api.js
 import axios from 'axios';
 
-// VITE_API_URL comes from .env.development or .env.production
+// Centralized API client with credentials
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || ''
+  baseURL: import.meta.env.VITE_API_URL || '', 
+  withCredentials: true,         // ← this makes the browser send your session cookie
 });
 
 export default api;
