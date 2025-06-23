@@ -26,7 +26,7 @@ export default function EventForm() {
   // Load existing event
   useEffect(() => {
     if (!isEdit) return setLoading(false);
-    api.get(`/admin/events/${id}`)
+    api.get(`/api/admin/events/${id}`)
       .then(res => {
         const e = res.data;
         setForm({
@@ -64,9 +64,9 @@ export default function EventForm() {
     e.preventDefault();
     try {
       if (isEdit) {
-        await api.put(`/admin/events/${id}`, form);
+        await api.put(`/api/admin/events/${id}`, form);
       } else {
-        await api.post('/admin/events', form);
+        await api.post('/api/admin/events', form);
       }
       navigate('/admin/events');
     } catch (err) {
@@ -77,8 +77,7 @@ export default function EventForm() {
 
   // Approve / reject an attendee inline
   const updateAttendee = async (userId, status) => {
-    await api.put(
-      `/admin/events/${id}/attendees/${userId}`,
+    await api.put(`/api/admin/events/${id}/attendees/${userId}`,
       { status }
     );
     setAttendees(a => a.map(x =>
