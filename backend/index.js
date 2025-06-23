@@ -32,12 +32,23 @@ app.use(
   webhookRouter
 );
 
-// ── 2️⃣ CORS + body parsers + session ―――――――――――――――――――――――――――――――――――――――――――――
-// 2a) CORS: allow your React origin, and permit credentials (cookies) to be sent
+// 2️⃣ CORS: allow both dev and prod origins, plus credentials
+const allowedOrigins = [
+  process.env.FRONTEND_URL,           // e.g. 'https://app.localsingles.me'
+  'http://localhost:5173'             // your local dev
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true,
+    origin: function(origin, callback) {
+      // allow requests with no origin (e.g. mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('CORS policy violation'));
+    },
+    credentials: true
   })
 );
 

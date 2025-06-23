@@ -1,10 +1,11 @@
-// frontend/src/api.js
 import axios from 'axios';
 
-// Centralized API client with credentials
+// In dev, use your local backend. In prod builds, calls go to same origin.
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '', 
-  withCredentials: true,         // ← this makes the browser send your session cookie
+  baseURL: import.meta.env.DEV
+    ? (import.meta.env.VITE_API_URL || 'http://localhost:5000')
+    : '',
+  withCredentials: true,
 });
 
 export default api;

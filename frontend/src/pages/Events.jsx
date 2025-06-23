@@ -15,11 +15,11 @@ export default function Events() {
   useEffect(() => {
     // 1) Fetch current user (to check subscriptionStatus)
     api
-      .get('/api/user/me', { withCredentials: true })
+      .get('/api/auth/me')
       .then((res) => {
-        setUser(res.data.user);
+        setUser(res.data);
         // 2) Fetch all upcoming events
-        return api.get('/api/events', { withCredentials: true });
+        return api.get('/api/events');
       })
       .then((res) => {
         setEvents(res.data);

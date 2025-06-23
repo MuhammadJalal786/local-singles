@@ -22,11 +22,11 @@ export default function EventDetail() {
   useEffect(() => {
     // 1) Get user
     api
-      .get('http://localhost:5000/api/user/me', { withCredentials: true })
+      .get('api/auth/me')
       .then((res) => {
-        setUser(res.data.user);
+        setUser(res.data);
         // 2) Then fetch the event by ID
-        return api.get(`http://localhost:5000/api/events/${id}`, { withCredentials: true });
+        return api.get(`/api/events/${id}`, { withCredentials: true });
       })
       .then((res) => {
         setEvt(res.data);
@@ -73,7 +73,7 @@ const hasRSVPed = () => {
     setModalLoading(true);
     setModalError('');
     try {
-      await api.post(`/api/events/${id}/rsvp`, {}, { withCredentials: true });
+      await api.post(`/api/events/${id}/rsvp`);
          // Update local state: add a proper subdocument { userId, status: 'pending' }
       setEvt((prev) => ({
         ...prev,
@@ -95,7 +95,7 @@ const hasRSVPed = () => {
  const cancelRequest = async () => {
     try {
       // 1) Tell the backend to remove this user from attendees
-      await api.delete(`http://localhost:5000/api/events/${id}/rsvp`, {
+      await api.delete(`/api/events/${id}/rsvp`, {
         withCredentials: true
       });
 
