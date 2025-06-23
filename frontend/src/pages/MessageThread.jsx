@@ -13,12 +13,12 @@ export default function MessageThread() {
 
   // get current user
   useEffect(() => {
-    api.get('/auth/me').then(res => setMe(res.data));
+    api.get('/api/auth/me').then(res => setMe(res.data));
   }, []);
 
   // fetch & poll
   const fetchMessages = () => {
-    api.get(`/messages/${userId}`)
+    api.get(`/api/messages/${userId}`)
       .then(res => setMessages(res.data))
       .catch(console.error);
   };
@@ -32,7 +32,7 @@ export default function MessageThread() {
   // send
   const sendMessage = async () => {
     if (!text.trim()) return;
-    await api.post(`/messages/${userId}`, { text });
+    await api.post(`/api/messages/${userId}`, { text });
     setText('');
     fetchMessages();
   };
